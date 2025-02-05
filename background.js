@@ -110,7 +110,8 @@ function getContent() {
   let goods = Game.Objects["Bank"].minigame.goods
   let stocks = {}
   Object.keys(goods).forEach(key => {
-    stocks[key] = {val: goods[key].val, active: goods[key].active, name: goods[key].name, bought: goods[key].stock}
+    let maxStock = Game.Objects["Bank"].minigame.getGoodMaxStock(goods[key])
+    stocks[key] = {val: goods[key].val, active: goods[key].active, name: goods[key].name, bought: goods[key].stock, maxStock:maxStock}
   })
   
   return {

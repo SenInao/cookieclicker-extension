@@ -28,7 +28,7 @@ function update() {
 
       stockList.forEach((key)=>{
         if (stocks[key].active) {
-          document.getElementById("stock-list").innerHTML += `<tr><td>${stocks[key].name}</td> <td>${stocks[key].val.toFixed(2)}$</td><td>${stocks[key].bought}</td></tr>`
+          document.getElementById("stock-list").innerHTML += `<tr><td>${stocks[key].name}</td> <td>${stocks[key].val.toFixed(2)}$</td><td>${stocks[key].bought}/${stocks[key].maxStock}</td></tr>`
         }
       })
     }
