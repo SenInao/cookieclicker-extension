@@ -105,33 +105,24 @@ function notifyUser(msg) {
 }
 
 function getContent() {
-  function formatCookies(cookies) {
-    const suffixes = ["", "thousand", "million", "billion", "trillion", "quadrillion", "quintillion"]
-    const tier = Math.log10(cookies) / 3 | 0
-    if (tier === 0) return cookies.toFixed(2)
-    const suffix = suffixes[tier]
-    const scale = Math.pow(10, tier * 3)
-    const scaled = cookies / scale
-    return `${scaled.toFixed(3)} ${suffix}`
-  }
-
   if (!window.Game) return null
 
   let goods = Game.Objects["Bank"].minigame.goods
   let stocks = {}
   Object.keys(goods).forEach(key => {
-    stocks[key] = {val: goods[key].val, active: goods[key].active, name: goods[key].name}
+    stocks[key] = {val: goods[key].val, active: goods[key].active, name: goods[key].name, bought: goods[key].stock}
   })
   
   return {
-    cookies: formatCookies(Game.cookies),
+    cookies: Game.cookies,
     farmT: (Game.Objects["Farm"].minigame.nextStep - Date.now()) / 1000,
     plot: Game.Objects["Farm"].minigame.plot,
     plants: Game.Objects["Farm"].minigame.plantsById,
     shimmers: Game.shimmers,
     buffs: Game.buffs,
     stocks: stocks,
-    bankT: Game.Objects["Bank"].minigame.tickT/30
+    bankT: Game.Objects["Bank"].minigame.tickT/30,
+    wrinklers: Game.wrinklers
   }
 }
 

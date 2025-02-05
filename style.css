@@ -1,0 +1,5 @@
+table, th, tr, td {
+  border: 1px solid gray;
+  marks: 5px;
+  padding: 2px;
+}
