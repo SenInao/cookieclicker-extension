@@ -1,5 +1,16 @@
+html {
+  margin: 0;
+  padding: 0;
+  color: #D2B48C;
+  background-color: #895129;
+}
+
 table, th, tr, td {
-  border: 1px solid gray;
-  marks: 5px;
-  padding: 2px;
+  border: 2px solid #D2B48C;
+  padding: 5px;
+  margin: 5px;
+}
+
+h1 {
+  text-align: center;
 }

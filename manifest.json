@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Get Background Tab HTML",
+  "name": "Cookie clicker helper",
   "version": "1.0",
   "permissions": ["scripting", "tabs", "notifications"],
   "host_permissions": ["https://orteil.dashnet.org/cookieclicker/"],

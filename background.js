@@ -1,4 +1,4 @@
-let gamestate
+let gamestate = null
 let previousGamestate = gamestate
 let notifications = []
 
@@ -43,6 +43,16 @@ function checkShimmerSpawn(prevShimmers, currShimmers) {
   return 0
 }
 
+function getMarketChanges(prevStocks, currStocks) {
+  let changes = []
+  Object.keys(currStocks).forEach((key)=>{
+    if (currStocks[key].active && currStocks[key].val < 2 && prevStocks[key].val >= 2) {
+      changes.push(`${currStocks[key].name} stock has gone below 2!`)
+    }
+  })
+  return changes
+}
+
 function stateUpdater() {
   chrome.tabs.query({}, tabs => {
     const cookieTab = tabs.find(tab => tab.url === "https://orteil.dashnet.org/cookieclicker/")
@@ -60,16 +70,6 @@ function stateUpdater() {
       )
     }
   })
-}
-
-function getMarketChanges(prevStocks, currStocks) {
-  let changes = []
-  Object.keys(currStocks).forEach((key)=>{
-    if (currStocks[key].active && currStocks[key].val < 2 && prevStocks[key].val >= 2) {
-      changes.push(`${currStocks[key].name} stock has gone below 2!`)
-    }
-  })
-  return changes
 }
 
 function handleGamestate(newgamestate) {
@@ -107,22 +107,25 @@ function notifyUser(msg) {
 function getContent() {
   if (!window.Game) return null
 
-  let goods = Game.Objects["Bank"].minigame.goods
+  let goods = Game.Objects.Bank.minigame.goods
   let stocks = {}
   Object.keys(goods).forEach(key => {
-    let maxStock = Game.Objects["Bank"].minigame.getGoodMaxStock(goods[key])
-    stocks[key] = {val: goods[key].val, active: goods[key].active, name: goods[key].name, bought: goods[key].stock, maxStock:maxStock}
+    let maxStock = Game.Objects.Bank.minigame.getGoodMaxStock(goods[key])
+    stocks[key] = {val: goods[key].val, active: goods[key].active, name: goods[key].name, bought: goods[key].stock, maxStock:maxStock, d:goods[key].d}
   })
   
   return {
     cookies: Game.cookies,
-    farmT: (Game.Objects["Farm"].minigame.nextStep - Date.now()) / 1000,
-    plot: Game.Objects["Farm"].minigame.plot,
-    plants: Game.Objects["Farm"].minigame.plantsById,
     shimmers: Game.shimmers,
     buffs: Game.buffs,
+
+    farmT: (Game.Objects.Farm.minigame.nextStep - Date.now()) / 1000,
+    plot: Game.Objects.Farm.minigame.plot,
+    plants: Game.Objects.Farm.minigame.plantsById,
+
     stocks: stocks,
-    bankT: Game.Objects["Bank"].minigame.tickT/30,
+    bankT: Game.Objects.Farm.minigame.tickT/30,
+
     wrinklers: Game.wrinklers
   }
 }
