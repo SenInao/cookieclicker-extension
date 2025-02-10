@@ -21,13 +21,11 @@ export function getContent() {
       restingValue: restingValue.toFixed(2),
       mode: stock.mode,
       modeLabel: modeLabels[stock.mode],
-      delta: stock.d.toFixed(3),
-      deltaDirection: stock.d > 0 ? "↑ Rising" : stock.d < 0 ? "↓ Falling" : "→ Stable",
       valuation: stock.val < restingValue ? "Undervalued" : "Overvalued",
       strength: Math.abs(stock.val - restingValue)/restingValue * 100,
+
       maxStock: Game.Objects.Bank.minigame.getGoodMaxStock(stock),
       bought: stock.stock,
-      val: stock.val,
       active: stock.active,
       name: stock.name
     };

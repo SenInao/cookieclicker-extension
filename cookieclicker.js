@@ -9,6 +9,13 @@ function formatNumber(cookies) {
   return `${scaled.toFixed(3)} ${suffix}`
 }
 
+function appendElement(parent, type, content, color="") {
+  let el = document.createElement(type)
+  el.innerHTML = content
+  el.style.color = color
+  parent.appendChild(el)
+}
+
 function update() {
   chrome.runtime.sendMessage({ action: "getContent" }, (response) => {
     if (response?.active && response.game) {
@@ -32,45 +39,24 @@ function update() {
       })
 
       let stocks = response.game.stocks
-      let stockList = Object.keys(stocks)
+      let stockList = Object.keys(stocks).sort((a, b) => stocks[a].currentPrice - stocks[b].currentPrice)
       document.getElementById("stock-list").innerHTML = "<tr><th>Stock</th><th>Price</th><th>Owned</th><th>Trend</th><th>Valuation</th></tr>"
 
       stockList.forEach((key)=>{
         if (stocks[key].active) {
           let rowEl = document.createElement("tr")
 
-          let nameEl = document.createElement("td")
-          nameEl.innerText = stocks[key].name
-          rowEl.appendChild(nameEl)
+          appendElement(rowEl, "td", stocks[key].symbol + " (" + stocks[key].restingValue + "$)")
+          appendElement(rowEl, "td", stocks[key].currentPrice + "$")
 
-          let valueEl = document.createElement("td")
-          valueEl.innerText = stocks[key].val.toFixed(2) + "$"
-          rowEl.appendChild(valueEl)
+          let color = stocks[key].bought > 0 ? "lightgreen" : null
+          appendElement(rowEl, "td", stocks[key].bought + "/" + stocks[key].maxStock, color)
 
-          let shareEl = document.createElement("td")
-          shareEl.innerText = stocks[key].bought + "/" + stocks[key].maxStock
-          if (stocks[key].bought > 0) {
-            shareEl.style.color = "lightgreen"
-          }
-          rowEl.appendChild(shareEl)
+          color = stocks[key].modeLabel.includes("Rise") ? "lightgreen" : stocks[key].modeLabel.includes("Fall") ? "red" : "orange"
+          appendElement(rowEl, "td", stocks[key].modeLabel, color)
 
-          let trendEl = document.createElement("td")
-          trendEl.innerText = stocks[key].deltaDirection
-          if (stocks[key].deltaDirection.includes("Rising")) {
-            trendEl.style.color = "lightgreen"
-          } else {
-            trendEl.style.color = "red"
-          }
-          rowEl.appendChild(trendEl)
-
-          let valuation = document.createElement("td")
-          valuation.innerText = stocks[key].valuation
-          if (stocks[key].valuation.includes("Overvalued")) {
-            valuation.style.color = "lightgreen"
-          } else {
-            valuation.style.color = "red"
-          }
-          rowEl.appendChild(valuation)
+          color = stocks[key].valuation.includes("Overvalued") ? "lightgreen" : "red"
+          appendElement(rowEl, "td", stocks[key].strength.toFixed(0) + "%", color)
 
           document.getElementById("stock-list").appendChild(rowEl)
         }
