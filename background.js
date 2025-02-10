@@ -48,8 +48,15 @@ function checkShimmerSpawn(prevShimmers, currShimmers) {
 function getMarketChanges(prevStocks, currStocks) {
   let changes = []
   Object.keys(currStocks).forEach((key)=>{
-    if (currStocks[key].active && currStocks[key].val < 2 && prevStocks[key].val >= 2) {
+    if (!currStocks[key].active) {
+      return
+    }
+    if (currStocks[key].currentPrice < 2 && prevStocks[key].currentPrice >= 2) {
       changes.push(`${currStocks[key].name} stock has gone below 2!`)
+    } else if (currStocks[key].bought > 0 && (currStocks[key].mode === 2 || currStocks[key].mode === 4) && currStocks[key].valuation === "Overvalued" && (prevStocks[key].mode !== 2 && prevStocks[key].mode !== 4)) {
+      console.log(currStocks[key].mode, prevStocks[key].mode)
+      changes.push(`${currStocks[key].name} is on its way down!`)
+
     }
   })
   return changes
@@ -88,10 +95,7 @@ function handleGamestate(newgamestate) {
     notifications.push("A golden cookie has appeared")
   }
 
-  if (gamestate.bankT < previousGamestate.bankT) {
-    notifications.push(...getMarketChanges(previousGamestate.stocks, gamestate.stocks))
-  }
-
+  notifications.push(...getMarketChanges(previousGamestate.stocks, gamestate.stocks))
   if (notifications.length) {
     notifyUser(notifications.join("\n"))
     notifications = []
