@@ -1,4 +1,5 @@
 function formatNumber(cookies) {
+  if (!cookies) return ""
   const suffixes = ["", "thousand", "million", "billion", "trillion", "quadrillion", "quintillion"]
   const tier = Math.log10(cookies) / 3 | 0
   if (tier === 0) return cookies.toFixed(2)
@@ -10,9 +11,10 @@ function formatNumber(cookies) {
 
 function update() {
   chrome.runtime.sendMessage({ action: "getContent" }, (response) => {
-    if (response?.active) {
-      document.getElementById("cookies").textContent = formatNumber(response.game.cookies);
+    if (response?.active && response.game) {
+      document.getElementById("cookies").textContent = "Total: " + formatNumber(response.game.cookies);
       document.getElementById("nextTick").textContent = "Next tick in: " + Math.round(response.game.farmT);
+      document.getElementById("cps").textContent = "CPS: " + formatNumber(response.game.cps)
 
       let wrinklerTotal = 0
       document.getElementById("wrinkler-list").innerHTML = ""
@@ -23,11 +25,15 @@ function update() {
         }
       })
       document.getElementById("wrinkler-total").innerText = `Total: ${formatNumber(wrinklerTotal)}`
-
+      
+      document.getElementById("buffs-container").innerHTML = ""
+      Object.keys(response.game.buffs).forEach(buff => {
+        document.getElementById("buffs-container").innerHTML+=`<label>${buff}: ${(response.game.buffs[buff].time/30).toFixed(0)}</label>`
+      })
 
       let stocks = response.game.stocks
-      let stockList = Object.keys(stocks).sort((a, b) => (stocks[a].val - stocks[b].val))
-      document.getElementById("stock-list").innerHTML = "<tr><th>Stock</th><th>Price</th><th>Owned</th><th>Trend</th></tr>"
+      let stockList = Object.keys(stocks)
+      document.getElementById("stock-list").innerHTML = "<tr><th>Stock</th><th>Price</th><th>Owned</th><th>Trend</th><th>Valuation</th></tr>"
 
       stockList.forEach((key)=>{
         if (stocks[key].active) {
@@ -38,7 +44,7 @@ function update() {
           rowEl.appendChild(nameEl)
 
           let valueEl = document.createElement("td")
-          valueEl.innerText = stocks[key].val.toFixed(2)
+          valueEl.innerText = stocks[key].val.toFixed(2) + "$"
           rowEl.appendChild(valueEl)
 
           let shareEl = document.createElement("td")
@@ -49,13 +55,22 @@ function update() {
           rowEl.appendChild(shareEl)
 
           let trendEl = document.createElement("td")
-          trendEl.innerText = stocks[key].d.toFixed(2) + "%"
-          if (stocks[key].d > 0) {
+          trendEl.innerText = stocks[key].deltaDirection
+          if (stocks[key].deltaDirection.includes("Rising")) {
             trendEl.style.color = "lightgreen"
           } else {
             trendEl.style.color = "red"
           }
           rowEl.appendChild(trendEl)
+
+          let valuation = document.createElement("td")
+          valuation.innerText = stocks[key].valuation
+          if (stocks[key].valuation.includes("Overvalued")) {
+            valuation.style.color = "lightgreen"
+          } else {
+            valuation.style.color = "red"
+          }
+          rowEl.appendChild(valuation)
 
           document.getElementById("stock-list").appendChild(rowEl)
         }

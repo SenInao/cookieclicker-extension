@@ -3,9 +3,13 @@
   "name": "Cookie clicker helper",
   "version": "1.0",
   "permissions": ["scripting", "tabs", "notifications"],
+  "icons": {
+    "512":"icon.png"
+  },
   "host_permissions": ["https://orteil.dashnet.org/cookieclicker/"],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "action": {
     "default_popup": "cookieclicker.html"

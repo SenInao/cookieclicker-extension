@@ -7,10 +7,19 @@ html {
 
 table, th, tr, td {
   border: 2px solid #D2B48C;
-  padding: 5px;
-  margin: 5px;
 }
 
 h1 {
   text-align: center;
 }
+
+#header-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#cookies, #cps {
+  display: block;
+}
+

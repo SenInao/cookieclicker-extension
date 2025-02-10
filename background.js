@@ -1,3 +1,5 @@
+import { getContent } from "./inject.js"
+
 let gamestate = null
 let previousGamestate = gamestate
 let notifications = []
@@ -76,6 +78,8 @@ function handleGamestate(newgamestate) {
   previousGamestate = gamestate
   gamestate = newgamestate
 
+  if (!gamestate || !previousGamestate) return
+
   if (previousGamestate.farmT < gamestate.farmT) {
     notifications.push(...getPlotChanges(previousGamestate.plot, gamestate.plot, gamestate.plants))
   }
@@ -102,32 +106,6 @@ function notifyUser(msg) {
     message: msg,
     priority: 2
   });
-}
-
-function getContent() {
-  if (!window.Game) return null
-
-  let goods = Game.Objects.Bank.minigame.goods
-  let stocks = {}
-  Object.keys(goods).forEach(key => {
-    let maxStock = Game.Objects.Bank.minigame.getGoodMaxStock(goods[key])
-    stocks[key] = {val: goods[key].val, active: goods[key].active, name: goods[key].name, bought: goods[key].stock, maxStock:maxStock, d:goods[key].d}
-  })
-  
-  return {
-    cookies: Game.cookies,
-    shimmers: Game.shimmers,
-    buffs: Game.buffs,
-
-    farmT: (Game.Objects.Farm.minigame.nextStep - Date.now()) / 1000,
-    plot: Game.Objects.Farm.minigame.plot,
-    plants: Game.Objects.Farm.minigame.plantsById,
-
-    stocks: stocks,
-    bankT: Game.Objects.Farm.minigame.tickT/30,
-
-    wrinklers: Game.wrinklers
-  }
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
